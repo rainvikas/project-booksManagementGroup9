@@ -74,7 +74,7 @@ const loginUser = async function (req, res) {
         let email = req.body.email
         let password = req.body.password
         
-        if ((!isValid(email))&& (!isValid(password))) {
+        if (!(isValid(email) && isValid(password))) {
             return res.status(400).send({ msg: " email and password is required " })
         } else {
             let createdUser = await UserModel.findOne({ email: email, password: password })
