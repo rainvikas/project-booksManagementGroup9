@@ -14,8 +14,8 @@ const userSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        trim : true,
-        match: [/^(\+91[\-\s]?)?[0]?(91)?[6789]\d{9}$/ ,'Please fill a valid phone number'],
+        trim: true,
+        match: [/^(\+91[\-\s]?)?[0]?(91)?[6789]\d{9}$/, 'Please fill a valid phone number'],
         unique: true,
         required: true
     },
@@ -31,16 +31,16 @@ const userSchema = new mongoose.Schema({
         trim: true,
         minlength: 8,
         maxlength: 15,
-        match: [/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,15}$/ ,'Please fill a valid password'],
+        match: [/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,15}$/, 'Please fill a valid password'],
         required: true
-        
+
     },
     address: {
         street: String,
         city: String,
         pincode: String
     },
-}, {timestamps: true}) ;
+}, { timestamps: true });
 
 
 

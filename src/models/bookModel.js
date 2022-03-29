@@ -14,16 +14,16 @@ const bookSchema = new mongoose.Schema({
         trim: true,
         required: true
     },
-    userId:{ 
+    userId: {
         type: ObjectId,
         ref: "user",
         required: true
     },
-     ISBN: {
+    ISBN: {
         type: String,
         trim: true,
         unique: true,
-        match: [/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/,'Please fill a valid ISBN no.'],
+        match: [/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/, 'Please fill a valid ISBN no.'],
         required: true
     },
     category: {
@@ -50,12 +50,12 @@ const bookSchema = new mongoose.Schema({
     },
     releasedAt: {
         type: Date,
-        format: /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/ ,
-        required:true
-        
+        format: /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/,
+        required: true
+
     },
-}, {timestamps:true});
+}, { timestamps: true });
 
 
 
-module.exports= mongoose.model('book',bookSchema)
+module.exports = mongoose.model('book', bookSchema)

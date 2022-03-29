@@ -46,7 +46,7 @@ const createUser = async function (req, res) {
         if (!isValid(password)) {
             return res.status(400).send({ status: false, msg: "password is required" })
         }
-        if (!(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,15}$/ .test(password))) {
+        if (!(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,15}$/.test(password))) {
             return res.status(400).send({ status: false, msg: "password length must be in between 8 to 15 and must contain atleast one number and uppercase and lowercase letter" })
         }
 
@@ -73,7 +73,7 @@ const loginUser = async function (req, res) {
     try {
         let email = req.body.email
         let password = req.body.password
-        
+
         if (!(isValid(email) && isValid(password))) {
             return res.status(400).send({ msg: " email and password is required " })
         } else {

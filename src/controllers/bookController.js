@@ -1,6 +1,8 @@
 const BookModel = require('../models/bookModel')
 const UserModel = require('../models/userModel')
+const ReviewModel = require('../models/reviewModel')
 const mongoose = require("mongoose")
+const bookModel = require('../models/bookModel')
 const ObjectId = mongoose.Types.ObjectId
 
 
@@ -98,13 +100,13 @@ const getBooks = async function (req, res) {
         let filterQuery = { isDeleted: false }
 
         if (isValid(userId) && isValidObjectId(userId)) {
-            filterQuery['userId'] = userId
+            filterQuery.userId = userId
         }
         if (isValid(category)) {
-            filterQuery['category'] = category
+            filterQuery.category = category
         }
         if (isValid(subCategory)) {
-            filterQuery['subCategory'] = subCategory
+            filterQuery.subCategory = subCategory
         }
 
         let filteredBooks = await BookModel.find(filterQuery)
@@ -122,5 +124,113 @@ const getBooks = async function (req, res) {
     }
 }
 
+const getBookById = async function (req, res) {
+    try {
+        let bookId = req.params.bookId
+
+        if (!isValidObjectId(bookId)) {
+            return res.status(400).send({ status: false, msg: "bookId is not a valid objectId" })
+        }
+
+        let bookDetails = await BookModel.findOne({ _id: bookId, isDeleted: false })
+
+        if (!bookDetails) {
+            return res.status(404).send({ status: false, msg: "no book exist with this bookId" })
+        }
+        else {
+            let reviewDetails = await ReviewModel.find({ bookId: bookDetails._id, isDeleted: false })
+                .select({ bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, reviews: 1 })
+            let bookData = bookDetails.toObject()
+            bookData.reviewsData = reviewDetails
+            return res.status(200).send({ status: true, NumberOfReviews: reviewDetails.length, data: bookData })
+        }
+    }
+    catch (error) {
+        console.log(error)
+        res.status(500).send({ msg: error.message })
+    }
+}
+
+const updateBook = async function (req, res) {
+    try {
+        let data = req.body
+        let bookId = req.params.bookId
+        let { title, excerpt, releaseDate, ISBN } = data
+
+        let booksToBeUpdated = {}
+
+        if (Object.keys(data).length == 0) {
+            return res.status(400).send({ status: false, msg: "Bad Request" })
+        }
+        if (isValid(title)) {
+            booksToBeUpdated.title = title
+        }
+        if (isValid(excerpt)) {
+            booksToBeUpdated.excerpt = excerpt
+        }
+        if (isValid(releaseDate)) {
+            booksToBeUpdated.releasedAt = releaseDate
+        }
+        if (data.hasOwnProperty('releaseDate')) {
+            if (!(/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(releaseDate))) {
+                return res.status(400).send({ status: false, msg: "releasedate should be in this format(YYYY-MM-DD) " })
+            }
+        }
+        if (isValid(ISBN)) {
+            booksToBeUpdated.ISBN = ISBN
+        }
+        if (data.hasOwnProperty('ISBN')) {
+            if (!(/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN))) {
+                return res.status(400).send({ status: false, msg: "please enter a valid ISBN no for update" })
+            }
+        }
+        let isTitleAlreadyUsed = await bookModel.findOne({ title })
+        if (isTitleAlreadyUsed) {
+            return res.status(400).send({ status: false, msg: "this title is already used, please provide another title" })
+        }
+        let isIsbnAlreadyUsed = await bookModel.findOne({ ISBN })
+        if (isIsbnAlreadyUsed) {
+            return re.status(400).send({ status: false, msg: "this ISBN no. is already used, please provide another ISBN no." })
+        }
+        let bookDetails = await bookModel.findOne({ _id: bookId, isDeleted: false })
+        if (!bookDetails) {
+            res.status(404).send({ statsu: false, msg: " book doesn't exist with this bookId" })
+        }
+        else {
+            let updatedBookDetails = await bookModel.findOneAndUpdate({ _id: bookId, isDeleted: false }, booksToBeUpdated, { new: true })
+            return res.status(201).send({ status: true, data: updatedBookDetails })
+        }
+    }
+    catch (error) {
+        console.log(error)
+        res.status(500).send({ msg: error.message })
+    }
+}
+const deleteBook = async function (req, res) {
+    try {
+        let bookId = req.params.bookId
+
+        if (!isValidObjectId(bookId)) {
+            return res.status(400).send({ status: false, msg: "bookId is not a valid objectId" })
+        }
+        let bookDetails = await bookModel.findOne({ _id: bookId, isDeleted: false })
+        if (!bookDetails) {
+            return res.status(404).send({ status: false, msg: "book not exist" })
+        }
+        else {
+            let bookToBeDeleted = await bookModel.updateMany({ _id: bookId, isDeleted: false }, { $set: { isDeleted: true }, deletedAt: Date.now() })
+            return res.status(200).send({ status: true, msg: "book deleted successfully" })
+        }
+
+    }
+    catch (error) {
+        console.log(error)
+        res.status(500).send({ msg: error.message })
+    }
+}
+
 module.exports.createBook = createBook
 module.exports.getBooks = getBooks
+module.exports.getBookById = getBookById
+module.exports.updateBook = updateBook
+module.exports.deleteBook = deleteBook
