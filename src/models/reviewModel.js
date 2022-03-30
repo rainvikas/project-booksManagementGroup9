@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.Types.ObjectId
+const moment = require('moment')
 
 const reviewSchema = new mongoose.Schema({
 
@@ -14,9 +15,9 @@ const reviewSchema = new mongoose.Schema({
         default: 'Guest'
     },
     reviewedAt: {
-        type: Date,
-        required: true,
-        format: /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/
+        type: String,
+        match: /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/,
+        default : moment().format("YYYY-MM-DD")
     },
     rating: {
         type: Number,
@@ -24,7 +25,7 @@ const reviewSchema = new mongoose.Schema({
         max: 5,
         required: true
     },
-    reviews: String,
+    review: String,
     isDeleted: {
         type: Boolean,
         default: false

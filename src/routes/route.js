@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const UserController = require('../controllers/userController')
 const BookController = require('../controllers/bookController');
-const ReviewModel = require('../models/reviewModel');
+const ReviewController = require('../controllers/reviewController');
 
 
 router.post('/register', UserController.createUser)
@@ -18,6 +18,12 @@ router.get('/books/:bookId', BookController.getBookById)
 router.put('/books/:bookId', BookController.updateBook)
 
 router.delete('/books/:bookId', BookController.deleteBook)
+
+router.post('/books/:bookId/review', ReviewController.createReview)
+
+router.put('/books/:bookId/review/:reviewId', ReviewController.updateReview)
+
+router.delete('/books/:bookId/review/:reviewId', ReviewController.deleteReview)
 
 
 
